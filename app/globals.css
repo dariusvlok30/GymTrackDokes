@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    --logo-filter: invert(1);   /* dark mode: black logo → white */
     --background: 0 0% 4%;
     --foreground: 0 0% 96%;
     --card: 0 0% 8%;
@@ -27,6 +28,7 @@
   }
 
   [data-theme="light"] {
+    --logo-filter: none;        /* light mode: black logo stays black */
     --background: 0 0% 98%;
     --foreground: 0 0% 4%;
     --card: 0 0% 100%;

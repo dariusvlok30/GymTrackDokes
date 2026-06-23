@@ -26,8 +26,13 @@ export function Sidebar() {
 
   return (
     <aside className="hidden md:flex h-screen w-60 flex-col bg-card border-r border-border fixed left-0 top-0 z-40">
-      <div className="flex h-14 items-center gap-2 px-5 border-b border-border shrink-0">
-        <span className="text-lg">🏋️</span>
+      <div className="flex h-14 items-center gap-2.5 px-5 border-b border-border shrink-0">
+        <img
+          src="/logo.png"
+          alt="GymTrack"
+          className="h-8 w-8 object-contain"
+          style={{ filter: 'var(--logo-filter)' }}
+        />
         <span className="text-lg font-bold tracking-tight text-foreground">GymTrack</span>
       </div>
       <nav className="flex-1 space-y-0.5 p-3 overflow-y-auto">

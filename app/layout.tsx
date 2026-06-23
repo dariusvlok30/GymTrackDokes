@@ -10,6 +10,10 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'GymTrack',
   description: 'Personal gym tracking & workout logging',
+  icons: {
+    icon: '/logo-white.png',
+    apple: '/logo-white.png',
+  },
 }
 
 export const viewport: Viewport = {

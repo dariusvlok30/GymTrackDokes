@@ -33,12 +33,14 @@ export function BottomNav() {
                 className="flex flex-col items-center gap-0.5 -mt-5"
               >
                 <div className={cn(
-                  'h-14 w-14 rounded-full flex items-center justify-center shadow-lg transition-all',
-                  isActive
-                    ? 'bg-primary text-primary-foreground scale-105'
-                    : 'bg-primary text-primary-foreground'
+                  'h-14 w-14 rounded-full flex items-center justify-center shadow-lg transition-all overflow-hidden',
+                  isActive ? 'bg-primary scale-105' : 'bg-primary'
                 )}>
-                  <Icon className="h-6 w-6" />
+                  <img
+                    src="/logo-white.png"
+                    alt="Log"
+                    className="h-8 w-8 object-contain"
+                  />
                 </div>
                 <span className="text-[10px] font-medium text-muted-foreground">{item.label}</span>
               </Link>
