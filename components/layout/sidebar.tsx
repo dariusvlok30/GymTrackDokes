@@ -30,8 +30,7 @@ export function Sidebar() {
         <img
           src="/logo.png"
           alt="GymTrack"
-          className="h-8 w-8 object-contain"
-          style={{ filter: 'var(--logo-filter)' }}
+          className="h-8 w-8 object-contain logo-themed"
         />
         <span className="text-lg font-bold tracking-tight text-foreground">GymTrack</span>
       </div>
