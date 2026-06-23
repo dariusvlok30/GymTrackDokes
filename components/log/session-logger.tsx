@@ -69,23 +69,23 @@ function Stepper({
   disabled?: boolean
 }) {
   return (
-    <div className="flex items-center gap-0">
+    <div className="flex items-center">
       <button
         type="button"
         disabled={disabled || value <= min}
         onClick={() => onChange(Math.max(min, Math.round((value - step) * 100) / 100))}
-        className="h-10 w-10 rounded-l-lg border border-border bg-secondary flex items-center justify-center text-foreground disabled:opacity-30 active:bg-secondary/80 transition-colors text-lg font-light"
+        className="h-9 w-8 rounded-l-lg border border-border bg-secondary flex items-center justify-center text-foreground disabled:opacity-30 active:bg-muted transition-colors text-base font-light shrink-0"
       >
         −
       </button>
-      <div className="h-10 w-14 border-t border-b border-border bg-background flex items-center justify-center">
-        <span className="text-base font-medium tabular-nums">{value % 1 === 0 ? value : value.toFixed(1)}</span>
+      <div className="h-9 w-10 border-t border-b border-border bg-background flex items-center justify-center shrink-0">
+        <span className="text-sm font-semibold tabular-nums">{value % 1 === 0 ? value : value.toFixed(1)}</span>
       </div>
       <button
         type="button"
         disabled={disabled}
         onClick={() => onChange(Math.round((value + step) * 100) / 100)}
-        className="h-10 w-10 rounded-r-lg border border-border bg-secondary flex items-center justify-center text-foreground disabled:opacity-30 active:bg-secondary/80 transition-colors text-lg font-light"
+        className="h-9 w-8 rounded-r-lg border border-border bg-secondary flex items-center justify-center text-foreground disabled:opacity-30 active:bg-muted transition-colors text-base font-light shrink-0"
       >
         +
       </button>
@@ -250,7 +250,7 @@ export function SessionLogger({ sessionId, exercises: initialExercises, startedA
 
               {/* Set rows */}
               {ex.expanded && (
-                <div className="px-4 pb-4 space-y-3">
+                <div className="px-3 pb-4 space-y-2.5">
                   {/* Previous best */}
                   {ex.prev_weight != null && ex.prev_weight > 0 && (
                     <div className="text-xs text-muted-foreground bg-secondary/60 rounded-lg px-3 py-2">
@@ -259,7 +259,7 @@ export function SessionLogger({ sessionId, exercises: initialExercises, startedA
                   )}
 
                   {/* Column labels */}
-                  <div className="grid grid-cols-[1.5rem_1fr_0.5rem_1fr_2.75rem] gap-2 items-center px-1">
+                  <div className="grid grid-cols-[1.25rem_1fr_auto_1fr_2.5rem] gap-1.5 items-center px-0.5">
                     <span className="text-[10px] text-muted-foreground text-center">#</span>
                     <span className="text-[10px] text-muted-foreground text-center">kg</span>
                     <span />
@@ -271,7 +271,7 @@ export function SessionLogger({ sessionId, exercises: initialExercises, startedA
                     <div
                       key={setIdx}
                       className={cn(
-                        'grid grid-cols-[1.5rem_1fr_0.5rem_1fr_2.75rem] gap-2 items-center',
+                        'grid grid-cols-[1.25rem_1fr_auto_1fr_2.5rem] gap-1.5 items-center',
                         set.completed && 'opacity-40'
                       )}
                     >

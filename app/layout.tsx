@@ -25,15 +25,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <head>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        {/* Theme init before paint — must be first child of body */}
         <script
           dangerouslySetInnerHTML={{
             __html: `try{var t=localStorage.getItem('gymtrack-theme')||'dark';document.documentElement.setAttribute('data-theme',t);}catch(e){}`,
           }}
         />
-      </head>
-      <body className={inter.className}>
         <ClerkProvider>
           {children}
         </ClerkProvider>
