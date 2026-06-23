@@ -5,21 +5,33 @@ export default function AccountSyncPage() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center space-y-4 max-w-md px-4">
         <div className="text-5xl">⚙️</div>
-        <h1 className="text-2xl font-bold text-foreground">Account Not Synced</h1>
-        <p className="text-muted-foreground text-sm leading-relaxed">
-          Your Clerk account exists but hasn&apos;t been synced to the database yet.
-          This means the Clerk webhook hasn&apos;t fired.
+        <h1 className="text-2xl font-bold text-foreground">Setup Required</h1>
+        <p className="text-muted-foreground text-sm">
+          Your account is authenticated but the database write failed.
+          The most likely cause is a missing environment variable in Vercel.
         </p>
-        <div className="bg-card border border-border rounded-lg p-4 text-left space-y-2 text-sm">
-          <p className="font-medium text-foreground">To fix this:</p>
-          <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-            <li>Go to Clerk Dashboard → Webhooks</li>
-            <li>Add endpoint: your Vercel URL + <code className="text-primary">/api/webhooks/clerk</code></li>
-            <li>Subscribe to <code className="text-primary">user.created</code> and <code className="text-primary">user.updated</code></li>
-            <li>Copy the signing secret → add as <code className="text-primary">CLERK_WEBHOOK_SECRET</code> in Vercel env vars</li>
-            <li>Redeploy Vercel, then sign out and sign back in</li>
-          </ol>
+        <div className="bg-card border border-border rounded-lg p-4 text-left space-y-3 text-sm">
+          <div>
+            <p className="font-medium text-foreground mb-1">Most likely fix:</p>
+            <p className="text-muted-foreground">
+              Go to <span className="text-primary">Vercel → Settings → Environment Variables</span> and make sure{' '}
+              <code className="text-primary font-mono">SUPABASE_SERVICE_ROLE_KEY</code> is set.
+            </p>
+            <p className="text-muted-foreground mt-1">
+              Get it from <span className="text-primary">Supabase → Settings → API → service_role</span> — it starts with <code className="text-primary">eyJ...</code> and is ~200 chars long.
+            </p>
+          </div>
+          <div>
+            <p className="font-medium text-foreground mb-1">After adding it:</p>
+            <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+              <li>Redeploy in Vercel (or it redeploys automatically)</li>
+              <li>Sign out here, then sign back in</li>
+            </ol>
+          </div>
         </div>
+        <p className="text-xs text-muted-foreground">
+          Check Vercel → Functions → Logs for the exact error message.
+        </p>
         <SignOutButton>
           <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm">
             Sign Out

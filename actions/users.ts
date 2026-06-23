@@ -42,6 +42,9 @@ export async function getCurrentDbUser(): Promise<DbUser> {
     .select()
     .single()
 
-  if (error || !created) redirect('/unauthorized')
+  if (error || !created) {
+    console.error('[getCurrentDbUser] insert failed:', error?.message, '| email:', email)
+    redirect('/account-sync')
+  }
   return created as DbUser
 }
