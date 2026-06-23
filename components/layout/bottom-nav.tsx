@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/hooks/use-theme'
 import { LayoutDashboard, Dumbbell, Plus, History, TrendingUp } from 'lucide-react'
 
 const navItems = [
@@ -15,6 +16,7 @@ const navItems = [
 
 export function BottomNav() {
   const pathname = usePathname()
+  const theme = useTheme()
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border pb-safe">
@@ -37,7 +39,7 @@ export function BottomNav() {
                   isActive ? 'bg-primary scale-105' : 'bg-primary'
                 )}>
                   <img
-                    src="/logo-white.png"
+                    src={theme === 'dark' ? '/logo.png' : '/logo-white.png'}
                     alt="Log"
                     className="h-10 w-10 object-contain"
                   />

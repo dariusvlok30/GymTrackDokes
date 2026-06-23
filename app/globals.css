@@ -86,11 +86,4 @@
   .pb-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
-  /* Logo: black PNG auto-inverts to white in dark mode */
-  .logo-themed {
-    filter: invert(1);
-  }
-  [data-theme="light"] .logo-themed {
-    filter: none;
-  }
 }

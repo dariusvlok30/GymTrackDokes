@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/hooks/use-theme'
 import {
   LayoutDashboard,
   Dumbbell,
@@ -23,14 +24,15 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const theme = useTheme()
 
   return (
     <aside className="hidden md:flex h-screen w-60 flex-col bg-card border-r border-border fixed left-0 top-0 z-40">
       <div className="flex h-14 items-center gap-2.5 px-5 border-b border-border shrink-0">
         <img
-          src="/logo.png"
+          src={theme === 'dark' ? '/logo-white.png' : '/logo.png'}
           alt="GymTrack"
-          className="h-8 w-8 object-contain logo-themed"
+          className="h-8 w-8 object-contain"
         />
         <span className="text-lg font-bold tracking-tight text-foreground">GymTrack</span>
       </div>
