@@ -39,7 +39,7 @@ export function BottomNav() {
                   <img
                     src="/logo-white.png"
                     alt="Log"
-                    className="h-8 w-8 object-contain"
+                    className="h-10 w-10 object-contain"
                   />
                 </div>
                 <span className="text-[10px] font-medium text-muted-foreground">{item.label}</span>
