@@ -10,17 +10,18 @@ export async function startSession(data: {
   splitId?: string
   splitDayId?: string
   isRestDay?: boolean
+  date?: string
 }) {
   const user = await getCurrentDbUser()
   const db = createServiceClient()
-  const today = format(new Date(), 'yyyy-MM-dd')
+  const date = data.date ?? format(new Date(), 'yyyy-MM-dd')
   const { data: session, error } = await db
     .from('sessions')
     .insert({
       user_id: user.id,
       split_id: data.splitId ?? null,
       split_day_id: data.splitDayId ?? null,
-      date: today,
+      date,
       is_rest_day: data.isRestDay ?? false,
     })
     .select()

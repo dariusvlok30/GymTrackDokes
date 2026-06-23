@@ -1,105 +1,190 @@
-import { Topbar } from '@/components/layout/topbar'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+'use client'
+
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { getActiveSplit } from '@/actions/workouts'
-import { StartSessionButton } from '@/components/log/start-session-button'
-import { Dumbbell, Moon, ZapOff } from 'lucide-react'
+import { startSession } from '@/actions/sessions'
+import { Dumbbell, Moon, ZapOff, Loader2, Calendar } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { useEffect } from 'react'
 
-export default async function LogPage() {
-  const activeSplit = await getActiveSplit()
+function todayStr() {
+  return new Date().toISOString().split('T')[0]
+}
+
+export default function LogPage() {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+  const [selectedDate, setSelectedDate] = useState(todayStr)
+  const [loadingDayId, setLoadingDayId] = useState<string | null>(null)
+  const [activeSplit, setActiveSplit] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getActiveSplit().then(split => {
+      setActiveSplit(split)
+      setLoading(false)
+    })
+  }, [])
+
+  const isToday = selectedDate === todayStr()
+
+  function handleTapDay(day: any) {
+    if (loadingDayId) return
+    setLoadingDayId(day.id)
+    startTransition(async () => {
+      const session = await startSession({
+        splitId: activeSplit?.id,
+        splitDayId: day.id,
+        isRestDay: day.is_rest_day,
+        date: selectedDate,
+      })
+      if (day.is_rest_day) {
+        router.push('/dashboard')
+      } else {
+        router.push(`/log/${session.id}`)
+      }
+    })
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
 
   return (
     <div>
-      <Topbar title="Log Workout" />
-      <div className="p-6 space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold">Start a Workout</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Select today&apos;s training day to begin logging
-          </p>
+      {/* Header */}
+      <div className="sticky top-0 bg-background/90 backdrop-blur-sm border-b border-border z-20 px-4 py-3">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-lg font-semibold">Log Workout</h1>
         </div>
+        {/* Date picker row */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setSelectedDate(todayStr())}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
+              isToday
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
+            )}
+          >
+            Today
+          </button>
+          <div className="relative flex-1">
+            <input
+              type="date"
+              value={selectedDate}
+              max={todayStr()}
+              onChange={e => setSelectedDate(e.target.value)}
+              className="w-full h-9 rounded-lg border border-border bg-secondary px-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none"
+            />
+          </div>
+        </div>
+      </div>
 
+      <div className="p-4 space-y-4">
         {!activeSplit ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
-              <ZapOff className="h-12 w-12 text-muted-foreground/40" />
-              <div className="text-center">
-                <p className="font-medium">No active split selected</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Set an active split first to start logging workouts
-                </p>
-              </div>
-              <Link href="/workouts">
-                <Button>Go to Splits</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <h3 className="font-medium text-sm text-muted-foreground">
-                {activeSplit.name}
-              </h3>
-              <Badge variant="success" className="text-xs">Active</Badge>
+          <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
+            <ZapOff className="h-12 w-12 text-muted-foreground/40" />
+            <div>
+              <p className="font-medium">No active split</p>
+              <p className="text-sm text-muted-foreground mt-1">Set an active split to start logging</p>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <Link href="/workouts">
+              <Button>Go to Splits</Button>
+            </Link>
+          </div>
+        ) : (
+          <>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide px-1">
+              {activeSplit.name}
+            </p>
+            <div className="grid grid-cols-1 gap-3">
               {((activeSplit as any).split_days ?? [])
                 .sort((a: any, b: any) => a.day_number - b.day_number)
                 .map((day: any) => {
-                  const exerciseCount = (day.day_exercises ?? []).length
+                  const exercises = day.day_exercises ?? []
+                  const isLoading = loadingDayId === day.id && isPending
+
                   return (
-                    <Card key={day.id} className="hover:border-primary/40 transition-colors">
-                      <CardHeader className="pb-2">
-                        <CardTitle className="text-sm flex items-center gap-2">
-                          {day.is_rest_day ? (
-                            <Moon className="h-4 w-4 text-muted-foreground" />
-                          ) : (
-                            <Dumbbell className="h-4 w-4 text-primary" />
-                          )}
-                          Day {day.day_number}: {day.name}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        {day.is_rest_day ? (
-                          <p className="text-xs text-muted-foreground mb-3">Rest & recover</p>
-                        ) : (
-                          <div className="mb-3">
-                            <p className="text-xs text-muted-foreground">
-                              {exerciseCount} exercise{exerciseCount !== 1 ? 's' : ''}
-                            </p>
-                            <div className="flex flex-wrap gap-1 mt-1.5">
-                              {(day.day_exercises ?? [])
-                                .slice(0, 4)
-                                .map((ex: any) => (
-                                  <span
-                                    key={ex.id}
-                                    className="text-xs bg-secondary rounded px-1.5 py-0.5 text-muted-foreground"
-                                  >
-                                    {ex.exercise?.name ?? 'Unknown'}
-                                  </span>
-                                ))}
-                              {exerciseCount > 4 && (
-                                <span className="text-xs text-muted-foreground">
-                                  +{exerciseCount - 4} more
-                                </span>
-                              )}
-                            </div>
+                    <button
+                      key={day.id}
+                      onClick={() => handleTapDay(day)}
+                      disabled={!!loadingDayId && isPending}
+                      className={cn(
+                        'w-full text-left rounded-xl border bg-card p-4 transition-all active:scale-[0.98]',
+                        day.is_rest_day
+                          ? 'border-border hover:border-muted-foreground/40'
+                          : 'border-border hover:border-primary/60 hover:bg-card',
+                        isLoading && 'opacity-60'
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={cn(
+                            'h-10 w-10 rounded-lg flex items-center justify-center shrink-0',
+                            day.is_rest_day ? 'bg-secondary' : 'bg-primary/10'
+                          )}>
+                            {day.is_rest_day
+                              ? <Moon className="h-5 w-5 text-muted-foreground" />
+                              : <Dumbbell className="h-5 w-5 text-primary" />
+                            }
                           </div>
-                        )}
-                        <StartSessionButton
-                          splitId={activeSplit.id}
-                          splitDayId={day.id}
-                          isRestDay={day.is_rest_day}
-                        />
-                      </CardContent>
-                    </Card>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-foreground text-base truncate">
+                              {day.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Day {day.day_number}
+                              {!day.is_rest_day && ` · ${exercises.length} exercises`}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="shrink-0 mt-0.5">
+                          {isLoading ? (
+                            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                          ) : (
+                            <div className={cn(
+                              'h-7 w-7 rounded-full border flex items-center justify-center',
+                              day.is_rest_day ? 'border-border' : 'border-primary/40'
+                            )}>
+                              <svg className="h-3 w-3 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {!day.is_rest_day && exercises.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {exercises.slice(0, 5).map((ex: any) => (
+                            <span
+                              key={ex.id}
+                              className="text-xs bg-secondary rounded-md px-2 py-0.5 text-muted-foreground"
+                            >
+                              {ex.exercise?.name ?? 'Unknown'}
+                            </span>
+                          ))}
+                          {exercises.length > 5 && (
+                            <span className="text-xs text-muted-foreground">
+                              +{exercises.length - 5} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </button>
                   )
                 })}
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>

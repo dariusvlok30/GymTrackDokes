@@ -3,7 +3,6 @@ import { getCurrentDbUser } from '@/actions/users'
 import { getPreviousBests } from '@/actions/sessions'
 import { notFound, redirect } from 'next/navigation'
 import { SessionLogger } from '@/components/log/session-logger'
-import { Topbar } from '@/components/layout/topbar'
 
 export default async function ActiveSessionPage({
   params,
@@ -43,16 +42,13 @@ export default async function ActiveSessionPage({
   }))
 
   return (
-    <div>
-      <Topbar title={splitDay?.name ?? 'Workout'} />
-      <div className="p-4 pb-24">
-        <SessionLogger
-          sessionId={sessionId}
-          exercises={exercises}
-          startedAt={(session as any).started_at}
-          splitDayName={splitDay?.name ?? 'Workout'}
-        />
-      </div>
+    <div className="min-h-screen bg-background">
+      <SessionLogger
+        sessionId={sessionId}
+        exercises={exercises}
+        startedAt={(session as any).started_at}
+        splitDayName={splitDay?.name ?? 'Workout'}
+      />
     </div>
   )
 }

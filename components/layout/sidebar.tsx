@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
   Dumbbell,
-  PlayCircle,
+  Plus,
   History,
   CalendarDays,
   TrendingUp,
@@ -15,7 +15,7 @@ import {
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/workouts', label: 'My Splits', icon: Dumbbell },
-  { href: '/log', label: 'Log Workout', icon: PlayCircle },
+  { href: '/log', label: 'Log Workout', icon: Plus },
   { href: '/history', label: 'History', icon: History },
   { href: '/calendar', label: 'Calendar', icon: CalendarDays },
   { href: '/progress', label: 'Progress', icon: TrendingUp },
@@ -26,7 +26,7 @@ export function Sidebar() {
 
   return (
     <aside className="hidden md:flex h-screen w-60 flex-col bg-card border-r border-border fixed left-0 top-0 z-40">
-      <div className="flex h-16 items-center gap-2 px-5 border-b border-border shrink-0">
+      <div className="flex h-14 items-center gap-2 px-5 border-b border-border shrink-0">
         <span className="text-lg">🏋️</span>
         <span className="text-lg font-bold tracking-tight text-foreground">GymTrack</span>
       </div>
@@ -41,9 +41,9 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-primary/10 text-primary'
+                  ? 'bg-primary text-primary-foreground'
                   : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
               )}
             >
