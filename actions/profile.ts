@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createServiceClient } from '@/lib/supabase/server'
 import { getCurrentDbUser } from './users'
-import type { Units, ActivityLevel } from '@/types/database'
+import type { Units, ActivityLevel, EnergyUnit } from '@/types/database'
 
 export async function saveOnboarding(data: {
   gender: 'male' | 'female' | 'other'
@@ -35,15 +35,18 @@ export async function saveOnboarding(data: {
 export async function updateUserSettings(data: {
   units?: Units
   theme?: 'dark' | 'light'
+  energy_unit?: EnergyUnit
 }) {
   const user = await getCurrentDbUser()
   const db = createServiceClient()
   const updates: Record<string, string> = {}
   if (data.units) updates.units = data.units
   if (data.theme) updates.theme = data.theme
+  if (data.energy_unit) updates.energy_unit = data.energy_unit
   const { error } = await db.from('users').update(updates).eq('id', user.id)
   if (error) throw new Error(error.message)
   revalidatePath('/settings')
+  revalidatePath('/profile')
 }
 
 export async function updateProfile(data: {

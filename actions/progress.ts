@@ -22,6 +22,7 @@ export async function logBodyWeight(data: {
   })
   if (error) throw new Error(error.message)
   revalidatePath('/progress')
+  revalidatePath('/profile')
 }
 
 export async function getBodyWeightLog(limit = 90): Promise<BodyweightLog[]> {

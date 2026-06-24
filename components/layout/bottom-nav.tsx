@@ -4,14 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useTheme } from '@/hooks/use-theme'
-import { LayoutDashboard, Dumbbell, Plus, History, TrendingUp } from 'lucide-react'
+import { LayoutDashboard, Dumbbell, History, UserCircle } from 'lucide-react'
 
 const navItems = [
-  { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
-  { href: '/workouts', label: 'Splits', icon: Dumbbell },
-  { href: '/log', label: 'Log', icon: Plus, primary: true },
-  { href: '/history', label: 'History', icon: History },
-  { href: '/progress', label: 'Progress', icon: TrendingUp },
+  { href: '/dashboard', label: 'Home',    icon: LayoutDashboard },
+  { href: '/workouts',  label: 'Splits',  icon: Dumbbell },
+  { href: '/log',       label: 'Log',     primary: true },
+  { href: '/history',   label: 'History', icon: History },
+  { href: '/profile',   label: 'Me',      icon: UserCircle },
 ]
 
 export function BottomNav() {
@@ -19,10 +19,9 @@ export function BottomNav() {
   const theme = useTheme()
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border pb-safe">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-t border-border pb-safe">
       <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
-          const Icon = item.icon
           const isActive =
             pathname === item.href ||
             (item.href !== '/dashboard' && pathname.startsWith(item.href))
@@ -35,25 +34,31 @@ export function BottomNav() {
                 className="flex flex-col items-center gap-0.5 -mt-5"
               >
                 <div className={cn(
-                  'h-14 w-14 rounded-full flex items-center justify-center shadow-lg transition-all overflow-hidden',
-                  isActive ? 'bg-primary scale-105' : 'bg-primary'
+                  'h-14 w-14 rounded-full flex items-center justify-center shadow-xl transition-all overflow-hidden border-2',
+                  isActive
+                    ? 'bg-primary scale-110 border-primary/20'
+                    : 'bg-primary border-primary/10'
                 )}>
                   <img
                     src={theme === 'dark' ? '/logo.png' : '/logo-white.png'}
                     alt="Log"
-                    className="h-10 w-10 object-contain"
+                    className="h-9 w-9 object-contain"
                   />
                 </div>
-                <span className="text-[10px] font-medium text-muted-foreground">{item.label}</span>
+                <span className={cn(
+                  'text-[10px] font-semibold transition-colors',
+                  isActive ? 'text-foreground' : 'text-muted-foreground'
+                )}>{item.label}</span>
               </Link>
             )
           }
 
+          const Icon = item.icon!
           return (
             <Link
               key={item.href}
               href={item.href}
-              className="flex flex-col items-center gap-0.5 px-3 py-2 min-w-[3rem]"
+              className="flex flex-col items-center gap-1 px-3 py-2 min-w-[3rem] relative"
             >
               <Icon className={cn(
                 'h-5 w-5 transition-colors',
@@ -65,6 +70,9 @@ export function BottomNav() {
               )}>
                 {item.label}
               </span>
+              {isActive && (
+                <span className="absolute top-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-foreground" />
+              )}
             </Link>
           )
         })}

@@ -2,6 +2,7 @@ export type UserRole = 'admin' | 'user'
 
 export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active'
 export type Units = 'metric' | 'imperial'
+export type EnergyUnit = 'kcal' | 'kj'
 
 export interface DbUser {
   id: string
@@ -18,6 +19,7 @@ export interface DbUser {
   activity_level: ActivityLevel | null
   units: Units
   theme: 'dark' | 'light'
+  energy_unit: EnergyUnit
   onboarded: boolean
 }
 

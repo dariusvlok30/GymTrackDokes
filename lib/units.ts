@@ -1,4 +1,4 @@
-import type { Units } from '@/types/database'
+import type { Units, EnergyUnit } from '@/types/database'
 
 export function displayWeight(kg: number | null, units: Units): string {
   if (kg == null) return '—'
@@ -40,4 +40,13 @@ export function weightUnit(units: Units): string {
 
 export function heightUnit(units: Units): string {
   return units === 'imperial' ? 'ft/in' : 'cm'
+}
+
+export function displayEnergy(kcal: number, energyUnit: EnergyUnit): string {
+  if (energyUnit === 'kj') return `${Math.round(kcal * 4.184).toLocaleString()} kJ`
+  return `${kcal.toLocaleString()} kcal`
+}
+
+export function energyLabel(energyUnit: EnergyUnit): string {
+  return energyUnit === 'kj' ? 'kJ' : 'kcal'
 }

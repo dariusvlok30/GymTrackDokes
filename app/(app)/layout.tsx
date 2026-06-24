@@ -13,7 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <SettingsProvider initialUnits={user.units} initialTheme={user.theme}>
+    <SettingsProvider initialUnits={user.units} initialTheme={user.theme} initialEnergyUnit={user.energy_unit ?? 'kcal'}>
       <div className="flex min-h-screen bg-background">
         <Sidebar />
         <main className="flex-1 md:ml-60 min-h-screen pb-20 md:pb-0">

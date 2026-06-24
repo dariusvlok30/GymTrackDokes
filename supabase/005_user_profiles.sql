@@ -13,6 +13,8 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS units TEXT NOT NULL DEFAULT 'metric'
 ALTER TABLE users ADD COLUMN IF NOT EXISTS theme TEXT NOT NULL DEFAULT 'dark'
   CHECK (theme IN ('dark', 'light'));
 ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarded BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS energy_unit TEXT NOT NULL DEFAULT 'kcal'
+  CHECK (energy_unit IN ('kcal', 'kj'));
 
 -- Mark existing users as already onboarded so they don't get redirected to the wizard
 UPDATE users SET onboarded = TRUE WHERE onboarded = FALSE;
