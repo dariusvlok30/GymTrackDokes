@@ -11,6 +11,8 @@ import {
   History,
   CalendarDays,
   TrendingUp,
+  HeartPulse,
+  Settings2,
 } from 'lucide-react'
 
 const navItems = [
@@ -20,6 +22,8 @@ const navItems = [
   { href: '/history', label: 'History', icon: History },
   { href: '/calendar', label: 'Calendar', icon: CalendarDays },
   { href: '/progress', label: 'Progress', icon: TrendingUp },
+  { href: '/profile', label: 'Health', icon: HeartPulse },
+  { href: '/settings', label: 'Settings', icon: Settings2 },
 ]
 
 export function Sidebar() {

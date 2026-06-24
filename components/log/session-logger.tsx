@@ -4,7 +4,9 @@ import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { logSet, finishSession } from '@/actions/sessions'
 import { cn } from '@/lib/utils'
-import { CheckCircle2, Circle, ChevronDown, ChevronUp, ArrowLeft } from 'lucide-react'
+import { useSettings } from '@/context/settings-context'
+import { weightUnit } from '@/lib/units'
+import { CheckCircle2, Circle, ChevronDown, ChevronUp, ArrowLeft, AlertCircle } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 
 interface SetState {
@@ -96,6 +98,8 @@ function Stepper({
 export function SessionLogger({ sessionId, exercises: initialExercises, startedAt, splitDayName }: SessionLoggerProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | null>(null)
+  const { units } = useSettings()
 
   const [exercises, setExercises] = useState<ExerciseState[]>(() =>
     initialExercises.map((ex, i) => ({
@@ -133,33 +137,51 @@ export function SessionLogger({ sessionId, exercises: initialExercises, startedA
     const set = ex.sets[setIdx]
     if (set.completed) return
 
-    startTransition(async () => {
-      await logSet({
-        sessionId,
-        exerciseId: ex.exercise_id,
-        setNumber: setIdx + 1,
-        weight: set.weight > 0 ? set.weight : null,
-        reps: set.reps > 0 ? set.reps : null,
-        rpe: ex.rpe,
-      })
-    })
-
+    // 1. Optimistically mark set as completed
     setExercises(prev =>
-      prev.map((ex, i) => {
-        if (i !== exIdx) return ex
-        const newSets = ex.sets.map((s, j) => j === setIdx ? { ...s, completed: true } : s)
+      prev.map((e, i) => {
+        if (i !== exIdx) return e
+        const newSets = e.sets.map((s, j) => j === setIdx ? { ...s, completed: true } : s)
         const allDone = newSets.every(s => s.completed)
-        return { ...ex, sets: newSets, expanded: !allDone }
-      }).map((ex, i) => {
+        return { ...e, sets: newSets, expanded: !allDone }
+      }).map((e, i) => {
+        // Auto-expand next exercise when current is finished
         if (i === exIdx + 1) {
-          const prevDone = exercises[exIdx].sets
-            .map((s, j) => j === exercises[exIdx].sets.length - 1 ? true : s.completed)
+          const currentAllDone = exercises[exIdx].sets
+            .map((s, j) => j === setIdx ? true : s.completed)
             .every(Boolean)
-          if (prevDone) return { ...ex, expanded: true }
+          if (currentAllDone) return { ...e, expanded: true }
         }
-        return ex
+        return e
       })
     )
+
+    // 2. Persist to DB in background — revert on failure
+    startTransition(async () => {
+      try {
+        await logSet({
+          sessionId,
+          exerciseId: ex.exercise_id,
+          setNumber: setIdx + 1,
+          weight: set.weight > 0 ? set.weight : null,
+          reps: set.reps > 0 ? set.reps : null,
+          rpe: ex.rpe,
+        })
+        setError(null)
+      } catch {
+        // Revert the optimistic update
+        setExercises(prev =>
+          prev.map((e, i) =>
+            i !== exIdx ? e : {
+              ...e,
+              sets: e.sets.map((s, j) => j === setIdx ? { ...s, completed: false } : s),
+              expanded: true,
+            }
+          )
+        )
+        setError('Failed to save set — check your connection and try again')
+      }
+    })
   }
 
   function toggleExpanded(exIdx: number) {
@@ -201,6 +223,15 @@ export function SessionLogger({ sessionId, exercises: initialExercises, startedA
           </div>
         </div>
         <Progress value={progressPct} className="h-1" />
+
+        {/* Error banner */}
+        {error && (
+          <div className="mt-2 flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2">
+            <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
+            <p className="text-xs text-destructive flex-1">{error}</p>
+            <button onClick={() => setError(null)} className="text-destructive text-xs font-medium">Dismiss</button>
+          </div>
+        )}
       </div>
 
       {/* Exercise list */}
@@ -254,14 +285,14 @@ export function SessionLogger({ sessionId, exercises: initialExercises, startedA
                   {/* Previous best */}
                   {ex.prev_weight != null && ex.prev_weight > 0 && (
                     <div className="text-xs text-muted-foreground bg-secondary/60 rounded-lg px-3 py-2">
-                      Previous best: <span className="text-foreground font-semibold">{ex.prev_weight}kg × {ex.prev_reps}</span>
+                      Last session: <span className="text-foreground font-semibold">{ex.prev_weight}kg × {ex.prev_reps}</span>
                     </div>
                   )}
 
                   {/* Column labels */}
                   <div className="grid grid-cols-[1.25rem_1fr_auto_1fr_2.5rem] gap-1.5 items-center px-0.5">
                     <span className="text-[10px] text-muted-foreground text-center">#</span>
-                    <span className="text-[10px] text-muted-foreground text-center">kg</span>
+                    <span className="text-[10px] text-muted-foreground text-center">{weightUnit(units)}</span>
                     <span />
                     <span className="text-[10px] text-muted-foreground text-center">reps</span>
                     <span />

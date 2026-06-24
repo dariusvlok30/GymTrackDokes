@@ -67,6 +67,7 @@ export async function finishSession(sessionId: string, durationSeconds: number) 
   revalidatePath('/history')
   revalidatePath('/dashboard')
   revalidatePath('/calendar')
+  revalidatePath('/log')
 }
 
 export async function getSessions(limit = 20): Promise<Session[]> {
@@ -129,7 +130,7 @@ export async function getPreviousBests(exerciseIds: string[], userId: string) {
       .select('weight, reps, sessions!inner(user_id)')
       .eq('exercise_id', exerciseId)
       .eq('sessions.user_id', userId)
-      .order('weight', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(1)
       .single()
     if (data) {

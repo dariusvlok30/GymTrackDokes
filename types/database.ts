@@ -1,5 +1,8 @@
 export type UserRole = 'admin' | 'user'
 
+export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active'
+export type Units = 'metric' | 'imperial'
+
 export interface DbUser {
   id: string
   clerk_id: string
@@ -7,6 +10,15 @@ export interface DbUser {
   name: string | null
   role: UserRole
   created_at: string
+  // Profile fields
+  gender: 'male' | 'female' | 'other' | null
+  date_of_birth: string | null
+  height_cm: number | null
+  weight_kg: number | null
+  activity_level: ActivityLevel | null
+  units: Units
+  theme: 'dark' | 'light'
+  onboarded: boolean
 }
 
 export interface Split {
